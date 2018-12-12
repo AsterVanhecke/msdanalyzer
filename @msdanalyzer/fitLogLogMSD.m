@@ -25,6 +25,8 @@ function obj = fitLogLogMSD(obj, clip_factor, silent, fitError, tE)
 % silent: do not print progress.
 % fitError: if 0, fit line, if 1, take into account dynamic error, if 2,
 % take into account static error, if 3, take into account both
+% tE: exposure time used by the camera (in the same units as your time
+% coordinate). Important for dynamical error. 
 
 if nargin < 2
     clip_factor = 0.25;
@@ -61,6 +63,7 @@ if ~silent
     fprintf('%4d/%4d', 0, n_spots);
 end
 msd=obj.msd;
+n_dim=obj.n_dim;
 parfor i_spot = 1 : n_spots
     if ~silent
         fprintf('\b\b\b\b\b\b\b\b\b%4d/%4d', i_spot, n_spots);
@@ -111,7 +114,7 @@ parfor i_spot = 1 : n_spots
             p=nan(1,3); resnorm=nan;
         end
         alpha(i_spot) = p(2);
-        gamma(i_spot) = 4*p(1); % gamma=4D % Consistent with line 119
+        gamma(i_spot) = 2*n_dim*p(1); % gamma=2*n_dim*D % Consistent with "gamma(i_spot) = exp(fo.p2);"
         r2fit(i_spot) = resnorm;
         if fitError>1
             sigma(i_spot) = p(3);
